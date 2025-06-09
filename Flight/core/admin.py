@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Airportroutes,Connetion
+from .models import Airport,AirportRoute
+from django.contrib.admin import site
 # Register your models here.
-admin.site.register(Airportroutes)
-admin.site.register(Connetion)
+
+site.register(Airport)
+site.register(AirportRoute)

@@ -1,66 +1,56 @@
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.generic import View
-from django.views.generic.edit import FormView,CreateView
-from .forms import AirportroutesForm,AirportCreationForm, SearchForm
-from .models import Airportroutes,Connetion
-# Create your views here.
+from .models import *
+from .forms import *
 
 
-class Home(View):
-    def get(self, request):
-        return render(request,'home.html')
-class AddAirport(CreateView):
-    template_name='add_airport.html'
-    form_class = AirportCreationForm
-    success_url='/'
+def get_nth_node(start_airport, direction, n):
+    current = start_airport
+    for _ in range(n):
+        try:
+            route = AirportRoute.objects.get(from_airport=current, position=direction)
+            current = route.to_airport
+        except AirportRoute.DoesNotExist:
+            return None  # No more nodes in that direction
+    return current
 
-    def get(self, request):
-        return render(request,self.template_name)
-    
-class AddAirportRoutes(CreateView):
-    template_name='add_routes.html'
-    form_class = AirportroutesForm
-    success_url='/add_routes'
+def get_longest_route():
+    return AirportRoute.objects.order_by('-duration').first()
 
-    def form_valid(self, form):
+def find_shortest_path(start, end, visited=None, current_duration=0):
+    if visited is None:
+        visited = set()
+
+    if start == end:
+        return current_duration
+
+    visited.add(start)
+
+    shortest = float('inf')
+    for route in AirportRoute.objects.filter(from_airport=start):
+        if route.to_airport not in visited:
+            duration = find_shortest_path(route.to_airport, end, visited.copy(), current_duration + route.duration)
+            if duration is not None:
+                shortest = min(shortest, duration)
+
+    return shortest if shortest != float('inf') else None
+
+
+
+def add_route_view(request):
+    form = AirportRouteForm(request.POST or None)
+    if form.is_valid():
         form.save()
-        return super().form_valid(form)
+    return render(request, 'add_route.html', {'form': form})
 
-
-class SearchRoutesLongest(View):
-    def get(self, request):
-        form=SearchForm()
-        return render(request,'search.html',{'form':form})
-    
-    def post(self, request):
-        form=SearchForm(request.POST)
-        # try:
+def search_nth_node_view(request):
+    result = None
+    if request.method == 'POST':
+        form = SearchNthNodeForm(request.POST)
         if form.is_valid():
-            takeoff_code=request.POST['takeoff_code']
-            destination_code=request.POST['destination_code']
-        
-            connections = Connetion.objects.filter(takeoff_code=takeoff_code,destination_code=destination_code).order_by('-duration')
-            data=connections[0]
-            return render(request,'search.html',{'data':data})
-        # except:
-        #     return HttpResponse("No Routes Found")
-
-
-
-class SearchRoutesSortest(View):
-    def get(self, request):
-        form=SearchForm()
-        return render(request,'search.html',{'form':form})
-    
-    def post(self, request):
-        form=SearchForm(request.POST)
-        # try:
-        if form.is_valid():
-            takeoff_code=request.POST['takeoff_code']
-            destination_code=request.POST['destination_code']
-            connections = Connetion.objects.filter(takeoff_code=takeoff_code,destination_code=destination_code).order_by('duration')
-            data=connections[0]
-            return render(request,'search.html',{'data':data})
-        # except:
-        #     return HttpResponse("No Routes Found"
+            start = form.cleaned_data['start_airport']
+            direction = form.cleaned_data['direction']
+            n = form.cleaned_data['n']
+            result = get_nth_node(start, direction, n)
+    else:
+        form = SearchNthNodeForm()
+    return render(request, 'search.html', {'form': form, 'result': result})

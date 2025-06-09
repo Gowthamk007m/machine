@@ -7,24 +7,28 @@
 
 </head>
 <body>
-    <div>
-        <form method="post">{% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Search">
-        </form>
+    {% block content %}
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Longest Route by Duration</h2>
+        </div>
+        <div class="card-body">
+            {% if longest_route %}
+            <div class="alert alert-info">
+                <h3>Longest Route</h3>
+                <p><strong>Route:</strong> {{ longest_route }}</p>
+                <p><strong>Origin:</strong> {{ longest_route.origin.code }} - {{ longest_route.origin.name }}</p>
+                <p><strong>Destination:</strong> {{ longest_route.destination.code }} - {{ longest_route.destination.name }}</p>
+                <p><strong>Position:</strong> {{ longest_route.position }}</p>
+                <p><strong>Duration:</strong> {{ longest_route.duration }} minutes</p>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <p>No routes found in the system.</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <div>
-            <h2>Take Off Code :{{data.takeoff_code}}</h2>
-            <br>
-            <h2>Destination Code :{{data.destination_code}}</h2>
-            <br>
-            <h2>Position :{{data.position}}</h2>
-<br>
-            <h2>Duration :{{data.duration}}</h2>
-        </table>
-    </div>
-
-    <div>
-    </div>
+    {% endblock %}
 </body>
 </html>

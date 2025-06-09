@@ -1,28 +1,13 @@
+# forms.py
 from django import forms
-from .models import Airportroutes,Connetion
+from .models import AirportRoute, Airport
 
-
-class AirportCreationForm(forms.ModelForm):
+class AirportRouteForm(forms.ModelForm):
     class Meta:
-        model = Airportroutes
-        fields = ['code']
+        model = AirportRoute
+        fields = ['from_airport', 'to_airport', 'position', 'duration']
 
-class AirportroutesForm(forms.ModelForm):
-    class Meta:
-        model = Connetion
-        fields = ['takeoff_code','destination_code','position','duration']
-        
-class FindNthNode(forms.ModelForm):
-    class Meta:
-        model=Connetion
-        fields=['destination_code']
-        
-
-
-class SearchForm(forms.ModelForm):
-    class Meta:
-        model = Connetion
-        takeoff_code = forms.ModelChoiceField(queryset=Airportroutes.objects.all())
-        destination_code = forms.ModelChoiceField(queryset=Airportroutes.objects.all())
-        fields = ['takeoff_code','destination_code']
-
+class SearchNthNodeForm(forms.Form):
+    start_airport = forms.ModelChoiceField(queryset=Airport.objects.all())
+    direction = forms.ChoiceField(choices=[('left', 'Left'), ('right', 'Right')])
+    n = forms.IntegerField(min_value=1)
