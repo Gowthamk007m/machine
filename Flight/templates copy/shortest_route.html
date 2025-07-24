@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2>Shortest Route Between Two Airports</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ form.origin.id_for_label }}" class="form-label">Origin Airport:</label>
+                {{ form.origin.errors }}
+                {{ form.origin }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.destination.id_for_label }}" class="form-label">Destination Airport:</label>
+                {{ form.destination.errors }}
+                {{ form.destination }}
+            </div>
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Find Shortest Route</button>
+        </form>
+
+        {% if shortest_route %}
+        <div class="mt-4">
+            <h3>Shortest Route</h3>
+            <div class="alert alert-success">
+                <p><strong>Route:</strong> {{ shortest_route }}</p>
+                <p><strong>Origin:</strong> {{ shortest_route.origin.code }} - {{ shortest_route.origin.name }}</p>
+                <p><strong>Destination:</strong> {{ shortest_route.destination.code }} - {{ shortest_route.destination.name }}</p>
+                <p><strong>Position:</strong> {{ shortest_route.position }}</p>
+                <p><strong>Duration:</strong> {{ shortest_route.duration }} minutes</p>
+            </div>
+        </div>
+        {% elif origin and destination %}
+        <div class="mt-4">
+            <div class="alert alert-warning">
+                <p>No direct route found between {{ origin.code }} and {{ destination.code }}.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% block content %}
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Welcome to Flight Routes System</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">This system allows you to manage airport routes and perform various operations:</p>
+            <ul class="list-group mb-4">
+                <li class="list-group-item">
+                    <h5><a href="{% url 'add_route' %}">Add Route</a></h5>
+                    <p>Add new routes between airports with position and duration information.</p>
+                </li>
+                <li class="list-group-item">
+                    <h5><a href="{% url 'search_node' %}">Search Node</a></h5>
+                    <p>Find the Nth left or right node in an airport route.</p>
+                </li>
+                <li class="list-group-item">
+                    <h5><a href="{% url 'longest_route' %}">Longest Route</a></h5>
+                    <p>Find the longest node based on duration in the airport system.</p>
+                </li>
+                <li class="list-group-item">
+                    <h5><a href="{% url 'shortest_route' %}">Shortest Route</a></h5>
+                    <p>Find the shortest node based on duration between two airports.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>
