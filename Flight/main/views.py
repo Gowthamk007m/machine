@@ -10,27 +10,26 @@ def home_page(request): # Example view to display the search form
 
 def search_results(request):
     form=SearchForm(request.GET)
- 
-    main_results=[]
     results = []
-    parent_name=''
-    count=0
+    max_results=0
+    min_results=0
     if form.is_valid():
             query = form.cleaned_data['search_query']
             data = NewAiportModel.objects.filter(name__icontains=query)
             results=checkView(request,data)
             print(results)
+            max_results=max(results)
+            print(max_results)
+            min_results=min(results)
+
             
-    return render(request, 'search.html', {'form': form, 'results': results})
+    return render(request, 'search.html', {'form': form, 'results': results,'max_results':max_results,'min_results':min_results})
 
 def checkView(request,data):
     results = []
     name_of_data=data[0].name
-    in_data=data
     the_head="A"
     new_parent_name=name_of_data
-    
-    current_node=""
     final=[]
     
     if new_parent_name==the_head:
@@ -47,6 +46,8 @@ def checkView(request,data):
             new_parent_name=left_check[0]['parent__name']
             
             if new_parent_name!=the_head:
+                results.append(unchanged_parent)
+                
                 results.append(left_check[0]['duration_left'])
                 results.append(new_parent_name)
             else:
@@ -58,6 +59,8 @@ def checkView(request,data):
             new_parent_name=right_check[0]['parent__name']
             
             if new_parent_name!=the_head:
+                results.append(unchanged_parent)
+                
                 results.append(right_check[0]['duration_right'])
                 results.append(new_parent_name)
             else:
@@ -68,9 +71,8 @@ def checkView(request,data):
         
         results.reverse()
         final.append(results)
-        final.reverse()
         results=[]
+    final.reverse()
     
 
-    print(final)
     return final
