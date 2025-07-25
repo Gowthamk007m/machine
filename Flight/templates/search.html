@@ -19,14 +19,9 @@
     <h1>Search Results</h1>
     {% if results %}
         <ul>
-            {% for item in results %}
-                <li>{{ item.name }}</li>
-                <li>{{ item.parent }}</li>
-                <li>{{ item.child_left }}</li>
-                <li>{{ item.child_right }}</li>
+                <li>{{ results }}</li>
+         
 
-
-            {% endfor %}
         </ul>
     {% else %}
         <p>No results found.</p>
